@@ -58,3 +58,6 @@ logs/
 # ServiceNow specific
 config/local.json
 config/*.local.json
+
+# External repositories
+awesome-mcp-servers/
