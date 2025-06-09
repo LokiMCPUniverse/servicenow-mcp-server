@@ -1,6 +1,6 @@
 # ServiceNow MCP Server Usage Examples
 
-This document provides practical examples of using the ServiceNow MCP Server with various AI assistants and IDEs.
+This document provides practical examples of using the ServiceNow MCP Server with MCP-compatible tools and IDEs.
 
 ## Table of Contents
 
@@ -20,7 +20,7 @@ This document provides practical examples of using the ServiceNow MCP Server wit
 Create a high priority incident for the email server being down. Assign it to the Email Support group.
 ```
 
-The assistant will use:
+Tool invocation:
 ```json
 {
   "tool": "incident_create",
@@ -40,7 +40,7 @@ The assistant will use:
 Update incident INC0000123 to In Progress state and add work notes that we're investigating the issue.
 ```
 
-The assistant will use:
+Tool invocation:
 ```json
 {
   "tool": "incident_update",
@@ -58,7 +58,7 @@ The assistant will use:
 Find all open incidents assigned to me with high priority.
 ```
 
-The assistant will use:
+Tool invocation:
 ```json
 {
   "tool": "incident_search",
@@ -77,7 +77,7 @@ The assistant will use:
 Resolve incident INC0000123 with resolution code "Solved (Permanently)" and notes about replacing the faulty hardware.
 ```
 
-The assistant will use:
+Tool invocation:
 ```json
 {
   "tool": "incident_update",
@@ -98,7 +98,7 @@ The assistant will use:
 Create an emergency change request to patch critical security vulnerability in the web server.
 ```
 
-The assistant will use:
+Tool invocation:
 ```json
 {
   "tool": "change_create",
@@ -121,7 +121,7 @@ The assistant will use:
 Create a standard change for monthly Windows updates on production servers.
 ```
 
-The assistant will use:
+Tool invocation:
 ```json
 {
   "tool": "change_create",
@@ -146,7 +146,7 @@ The assistant will use:
 Find all production web servers that are currently operational.
 ```
 
-The assistant will use:
+Tool invocation:
 ```json
 {
   "tool": "ci_search",
@@ -194,7 +194,7 @@ Then get its relationships:
 List all active users in the IT department.
 ```
 
-The assistant will use:
+Tool invocation:
 ```json
 {
   "tool": "user_search",
@@ -212,7 +212,7 @@ The assistant will use:
 Find the user John Doe's account information.
 ```
 
-The assistant will use:
+Tool invocation:
 ```json
 {
   "tool": "user_search",
@@ -231,7 +231,7 @@ The assistant will use:
 Find knowledge articles about password reset procedures.
 ```
 
-The assistant will use:
+Tool invocation:
 ```json
 {
   "tool": "kb_search",
@@ -249,7 +249,7 @@ The assistant will use:
 Find all published VPN setup guides.
 ```
 
-The assistant will use:
+Tool invocation:
 ```json
 {
   "tool": "kb_search",
@@ -269,7 +269,7 @@ The assistant will use:
 Show me all active applications in our custom application registry that are in production.
 ```
 
-The assistant will use:
+Tool invocation:
 ```json
 {
   "tool": "query_table",
@@ -289,7 +289,7 @@ The assistant will use:
 Add a new entry to our vendor management table for Acme Corp.
 ```
 
-The assistant will use:
+Tool invocation:
 ```json
 {
   "tool": "create_record",
@@ -314,7 +314,7 @@ The assistant will use:
 Show me incident statistics grouped by priority for this month.
 ```
 
-The assistant will use:
+Tool invocation:
 ```json
 {
   "tool": "get_stats",
@@ -344,7 +344,7 @@ The assistant will use:
 Find all incidents that are either high priority unassigned tickets or medium priority tickets older than 7 days.
 ```
 
-The assistant will use:
+Tool invocation:
 ```json
 {
   "tool": "incident_search",
@@ -373,17 +373,17 @@ Then apply custom query:
 
 ### VS Code / Cursor
 
-When using with VS Code or Cursor, you can ask the assistant to:
+When using with VS Code or Cursor, you can:
 - "Check for any P1 incidents before I deploy this code"
 - "Create a change request for this deployment"
 - "Find the CI record for the server I'm deploying to"
 
-### Claude Desktop
+### Desktop Clients
 
-With Claude Desktop, you can:
-- "Monitor my team's incident queue while I work"
-- "Draft a knowledge article about the issue I just resolved"
-- "Update the CMDB with the new server I just provisioned"
+With MCP desktop clients, you can:
+- Monitor your team's incident queue
+- Create knowledge articles about resolved issues
+- Update the CMDB with newly provisioned servers
 
 ### Automation Scripts
 

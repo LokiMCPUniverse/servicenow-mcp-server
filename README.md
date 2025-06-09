@@ -8,11 +8,11 @@
 
 A highly customizable Model Context Protocol (MCP) server for ServiceNow API integration. This server enables AI assistants and development tools to interact with ServiceNow instances through a standardized interface.
 
-🚀 **Built for the AI era** - Seamlessly integrate ServiceNow with Claude, ChatGPT, VS Code Copilot, Cursor, and any MCP-compatible AI tool.
+**Enterprise-grade ServiceNow integration** - Connect ServiceNow with modern development tools and automation frameworks through the Model Context Protocol.
 
 ## Features
 
-- 🔧 **Comprehensive ServiceNow API Coverage**
+- **Comprehensive ServiceNow API Coverage**
   - Incident Management
   - Change Management
   - Problem Management
@@ -22,20 +22,20 @@ A highly customizable Model Context Protocol (MCP) server for ServiceNow API int
   - User Management
   - Custom Table Operations
 
-- 🎛️ **Highly Customizable**
+- **Highly Customizable**
   - Feature flags to enable/disable modules
   - Environment-based configuration
   - JSON configuration files with override support
   - Flexible authentication options
 
-- 🚀 **Production Ready**
+- **Production Ready**
   - Async/await support for high performance
   - Retry logic with exponential backoff
   - Comprehensive error handling
   - Structured JSON logging
   - Rate limit handling
 
-- 🔌 **Easy Integration**
+- **Easy Integration**
   - Compatible with Claude Desktop, VS Code, Cursor, and other MCP clients
   - Standard MCP protocol implementation
   - Simple CLI interface
@@ -127,11 +127,11 @@ The server supports multiple configuration methods with the following precedence
 }
 ```
 
-## Integration with AI Tools
+## Integration with MCP Clients
 
-### Claude Desktop
+### Desktop Configuration
 
-Add to your Claude Desktop configuration (`claude_desktop_config.json`):
+Add to your MCP client configuration:
 
 ```json
 {
@@ -347,5 +347,5 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## Acknowledgments
 
-- Built on the [Model Context Protocol](https://modelcontextprotocol.io/) by Anthropic
+- Built on the [Model Context Protocol](https://modelcontextprotocol.io/) standard
 - ServiceNow is a registered trademark of ServiceNow, Inc.
