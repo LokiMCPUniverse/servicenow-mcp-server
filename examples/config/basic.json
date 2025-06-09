@@ -1,0 +1,17 @@
+{
+  "servicenow": {
+    "instance": "dev12345.service-now.com",
+    "username": "admin",
+    "password": "your-password-here"
+  },
+  "features": {
+    "incident_management": true,
+    "change_management": true,
+    "cmdb": true,
+    "custom_tables": false
+  },
+  "logging": {
+    "level": "INFO",
+    "format": "text"
+  }
+}

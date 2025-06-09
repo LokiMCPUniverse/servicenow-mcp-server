@@ -1,0 +1,16 @@
+{
+  "mcp.servers": {
+    "servicenow": {
+      "command": "servicenow-mcp",
+      "cwd": "${workspaceFolder}",
+      "env": {
+        "SERVICENOW_INSTANCE": "${env:SERVICENOW_INSTANCE}",
+        "SERVICENOW_USERNAME": "${env:SERVICENOW_USERNAME}",
+        "SERVICENOW_PASSWORD": "${env:SERVICENOW_PASSWORD}",
+        "SERVICENOW_FEATURE_CUSTOM_TABLES": "false",
+        "MCP_LOG_LEVEL": "DEBUG",
+        "MCP_LOG_FILE": "${workspaceFolder}/logs/servicenow-mcp.log"
+      }
+    }
+  }
+}

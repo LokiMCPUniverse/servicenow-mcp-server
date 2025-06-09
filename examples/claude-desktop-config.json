@@ -1,0 +1,23 @@
+{
+  "mcpServers": {
+    "servicenow": {
+      "command": "servicenow-mcp",
+      "env": {
+        "SERVICENOW_INSTANCE": "your-instance.service-now.com",
+        "SERVICENOW_USERNAME": "your-username",
+        "SERVICENOW_PASSWORD": "your-password",
+        "MCP_LOG_LEVEL": "INFO"
+      }
+    },
+    "servicenow-dev": {
+      "command": "servicenow-mcp",
+      "args": ["--config-dir", "/path/to/dev/config"],
+      "env": {
+        "SERVICENOW_INSTANCE": "dev.service-now.com",
+        "SERVICENOW_USERNAME": "dev-user",
+        "SERVICENOW_PASSWORD": "dev-password",
+        "MCP_LOG_LEVEL": "DEBUG"
+      }
+    }
+  }
+}
