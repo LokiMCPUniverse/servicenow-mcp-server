@@ -1,6 +1,14 @@
 # ServiceNow MCP Server
 
+[![Python Version](https://img.shields.io/badge/python-3.9%2B-blue)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![MCP Version](https://img.shields.io/badge/MCP-1.1.0%2B-green)](https://modelcontextprotocol.io/)
+[![CI Status](https://github.com/asklokesh/servicenow-mcp-server/workflows/CI/badge.svg)](https://github.com/asklokesh/servicenow-mcp-server/actions)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+
 A highly customizable Model Context Protocol (MCP) server for ServiceNow API integration. This server enables AI assistants and development tools to interact with ServiceNow instances through a standardized interface.
+
+🚀 **Built for the AI era** - Seamlessly integrate ServiceNow with Claude, ChatGPT, VS Code Copilot, Cursor, and any MCP-compatible AI tool.
 
 ## Features
 
