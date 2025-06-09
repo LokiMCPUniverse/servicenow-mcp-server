@@ -49,6 +49,11 @@ ignore = ["E501"]
 python_version = "3.9"
 strict = true
 ignore_missing_imports = true
+exclude = ["venv/", "build/", "dist/"]
+
+[[tool.mypy.overrides]]
+module = "mcp.*"
+ignore_errors = true
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/servicenow_mcp"]

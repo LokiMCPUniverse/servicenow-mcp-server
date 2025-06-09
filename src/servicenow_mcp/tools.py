@@ -1,6 +1,6 @@
 """Tool definitions and handlers for ServiceNow operations."""
 
-from typing import Any, Callable, Optional
+from typing import Any, Callable, Optional, Awaitable
 
 from mcp.types import Tool
 
@@ -15,7 +15,7 @@ class ToolRegistry:
         """Initialize tool registry with feature configuration."""
         self.features = features
         self._tools: dict[str, Tool] = {}
-        self._handlers: dict[str, Callable] = {}
+        self._handlers: dict[str, Callable[..., Awaitable[Any]]] = {}
 
         # Register all tools
         self._register_all_tools()
@@ -31,7 +31,7 @@ class ToolRegistry:
 
         return enabled_tools
 
-    def get_handler(self, name: str) -> Optional[Callable]:
+    def get_handler(self, name: str) -> Optional[Callable[..., Awaitable[Any]]]:
         """Get handler for a specific tool."""
         return self._handlers.get(name)
 
@@ -66,7 +66,7 @@ class ToolRegistry:
 
         return True
 
-    def _register_all_tools(self):
+    def _register_all_tools(self) -> None:
         """Register all available tools."""
 
         # Table operations (custom tables)
@@ -556,7 +556,7 @@ class ToolRegistry:
             self._handle_get_stats,
         )
 
-    def _register_tool(self, name: str, tool: Tool, handler: Callable):
+    def _register_tool(self, name: str, tool: Tool, handler: Callable[..., Awaitable[Any]]) -> None:
         """Register a tool with its handler."""
         self._tools[name] = tool
         self._handlers[name] = handler

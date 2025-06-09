@@ -5,7 +5,7 @@ import logging
 from typing import Any, Optional
 
 import click
-from mcp.server import Server
+from mcp.server import Server  # type: ignore[import]
 from mcp.server.models import InitializationOptions
 from mcp.server.stdio import stdio_server
 from mcp.types import (
@@ -26,7 +26,7 @@ class ServiceNowMCPServer:
         """Initialize the ServiceNow MCP Server."""
         self.config = config
         self.client = ServiceNowClient(config.servicenow)
-        self.server = Server(config.mcp.name)
+        self.server = Server(config.mcp.name)  # type: ignore[var-annotated]
         self.tools = ToolRegistry(config.features)
 
         # Setup logging
@@ -35,15 +35,16 @@ class ServiceNowMCPServer:
         # Register handlers
         self._register_handlers()
 
-    def _setup_logging(self):
+    def _setup_logging(self) -> None:
         """Configure logging based on configuration."""
         log_level = getattr(logging, self.config.logging.level.upper(), logging.INFO)
 
+        formatter: logging.Formatter
         if self.config.logging.format == "json":
             import json
 
             class JsonFormatter(logging.Formatter):
-                def format(self, record):
+                def format(self, record: logging.LogRecord) -> str:
                     log_data = {
                         "timestamp": self.formatTime(record),
                         "level": record.levelname,
@@ -76,15 +77,15 @@ class ServiceNowMCPServer:
 
         self.logger = logger
 
-    def _register_handlers(self):
+    def _register_handlers(self) -> None:
         """Register MCP protocol handlers."""
 
-        @self.server.list_tools()
+        @self.server.list_tools()  # type: ignore[no-untyped-call,misc]
         async def list_tools() -> list[Tool]:
             """List all available tools."""
             return self.tools.get_enabled_tools()
 
-        @self.server.call_tool()
+        @self.server.call_tool()  # type: ignore[no-untyped-call,misc]
         async def call_tool(name: str, arguments: dict[str, Any]) -> list[TextContent]:
             """Execute a tool and return results."""
             try:
@@ -118,7 +119,7 @@ class ServiceNowMCPServer:
                 self.logger.exception(f"Unexpected error in tool {name}")
                 return [TextContent(type="text", text=f"Unexpected Error: {e!s}")]
 
-    async def run(self):
+    async def run(self) -> None:
         """Run the MCP server."""
         self.logger.info(f"Starting ServiceNow MCP Server v{self.config.mcp.version}")
         self.logger.info(f"Connected to instance: {self.config.servicenow.instance}")
@@ -128,7 +129,7 @@ class ServiceNowMCPServer:
             init_options = InitializationOptions(
                 server_name=self.config.mcp.name,
                 server_version=self.config.mcp.version,
-                capabilities=self.server.get_capabilities(
+                capabilities=self.server.get_capabilities(  # type: ignore[arg-type]
                     notification_options=None,
                     experimental_capabilities={},
                 ),
@@ -153,10 +154,11 @@ class ServiceNowMCPServer:
     type=click.Choice(["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]),
     help="Override log level",
 )
-def main(config_dir: str, log_level: Optional[str]):
+def main(config_dir: str, log_level: Optional[str]) -> None:
     """Run the ServiceNow MCP Server."""
     # Load configuration
-    config_manager = ConfigManager(config_dir)
+    from pathlib import Path
+    config_manager = ConfigManager(Path(config_dir))
     config = config_manager.load()
 
     # Override log level if provided

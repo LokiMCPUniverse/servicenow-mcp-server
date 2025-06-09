@@ -13,19 +13,19 @@ class ServiceNowAPIError(ServiceNowError):
     pass
 
 
-class ServiceNowAuthenticationError(ServiceNowError):
+class ServiceNowAuthenticationError(ServiceNowAPIError):
     """Exception raised for authentication errors."""
 
     pass
 
 
-class ServiceNowNotFoundError(ServiceNowError):
+class ServiceNowNotFoundError(ServiceNowAPIError):
     """Exception raised when a resource is not found."""
 
     pass
 
 
-class ServiceNowRateLimitError(ServiceNowError):
+class ServiceNowRateLimitError(ServiceNowAPIError):
     """Exception raised when rate limit is exceeded."""
 
     pass

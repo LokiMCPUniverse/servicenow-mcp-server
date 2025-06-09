@@ -19,18 +19,18 @@ from .exceptions import (
 class ServiceNowClient:
     """Async client for ServiceNow API interactions."""
 
-    def __init__(self, config: ServiceNowConfig):
+    def __init__(self, config: ServiceNowConfig) -> None:
         """Initialize ServiceNow client."""
         self.config = config
         self.base_url = f"{config.instance}/api/now"
         self._client: Optional[httpx.AsyncClient] = None
 
-    async def __aenter__(self):
+    async def __aenter__(self) -> "ServiceNowClient":
         """Async context manager entry."""
         await self.connect()
         return self
 
-    async def __aexit__(self, exc_type, exc_val, exc_tb):
+    async def __aexit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
         """Async context manager exit."""
         await self.close()
 
@@ -67,6 +67,7 @@ class ServiceNowClient:
         url = f"{self.base_url}/{endpoint}"
 
         try:
+            assert self._client is not None
             response = await self._client.request(
                 method=method,
                 url=url,
@@ -104,7 +105,8 @@ class ServiceNowClient:
         response.raise_for_status()
 
         try:
-            return response.json()
+            data = response.json()
+            return data if isinstance(data, dict) else {}
         except json.JSONDecodeError:
             raise ServiceNowAPIError(
                 f"Invalid JSON response: {response.text}"
@@ -283,6 +285,7 @@ class ServiceNowClient:
             await self.connect()
 
         url = f"{self.base_url}/{endpoint}"
+        assert self._client is not None
         response = await self._client.post(
             url,
             params=params,
@@ -307,44 +310,44 @@ class ServiceNowClient:
 
     # Specialized methods for common tables
 
-    async def get_incident(self, sys_id: str, **kwargs) -> dict[str, Any]:
+    async def get_incident(self, sys_id: str, **kwargs: Any) -> dict[str, Any]:
         """Get an incident by sys_id."""
         return await self.get_record("incident", sys_id, **kwargs)
 
-    async def query_incidents(self, **kwargs) -> list[dict[str, Any]]:
+    async def query_incidents(self, **kwargs: Any) -> list[dict[str, Any]]:
         """Query incidents."""
         return await self.query_records("incident", **kwargs)
 
-    async def create_incident(self, data: dict[str, Any], **kwargs) -> dict[str, Any]:
+    async def create_incident(self, data: dict[str, Any], **kwargs: Any) -> dict[str, Any]:
         """Create a new incident."""
         return await self.create_record("incident", data, **kwargs)
 
     async def update_incident(
-        self, sys_id: str, data: dict[str, Any], **kwargs
+        self, sys_id: str, data: dict[str, Any], **kwargs: Any
     ) -> dict[str, Any]:
         """Update an incident."""
         return await self.update_record("incident", sys_id, data, **kwargs)
 
-    async def get_change_request(self, sys_id: str, **kwargs) -> dict[str, Any]:
+    async def get_change_request(self, sys_id: str, **kwargs: Any) -> dict[str, Any]:
         """Get a change request by sys_id."""
         return await self.get_record("change_request", sys_id, **kwargs)
 
-    async def query_change_requests(self, **kwargs) -> list[dict[str, Any]]:
+    async def query_change_requests(self, **kwargs: Any) -> list[dict[str, Any]]:
         """Query change requests."""
         return await self.query_records("change_request", **kwargs)
 
-    async def get_user(self, sys_id: str, **kwargs) -> dict[str, Any]:
+    async def get_user(self, sys_id: str, **kwargs: Any) -> dict[str, Any]:
         """Get a user by sys_id."""
         return await self.get_record("sys_user", sys_id, **kwargs)
 
-    async def query_users(self, **kwargs) -> list[dict[str, Any]]:
+    async def query_users(self, **kwargs: Any) -> list[dict[str, Any]]:
         """Query users."""
         return await self.query_records("sys_user", **kwargs)
 
-    async def get_ci(self, sys_id: str, **kwargs) -> dict[str, Any]:
+    async def get_ci(self, sys_id: str, **kwargs: Any) -> dict[str, Any]:
         """Get a configuration item by sys_id."""
         return await self.get_record("cmdb_ci", sys_id, **kwargs)
 
-    async def query_cis(self, **kwargs) -> list[dict[str, Any]]:
+    async def query_cis(self, **kwargs: Any) -> list[dict[str, Any]]:
         """Query configuration items."""
         return await self.query_records("cmdb_ci", **kwargs)

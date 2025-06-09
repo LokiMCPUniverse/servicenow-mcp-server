@@ -109,7 +109,8 @@ class ConfigManager:
 
         try:
             with open(file_path) as f:
-                return json.load(f)
+                data = json.load(f)
+                return data if isinstance(data, dict) else {}
         except Exception as e:
             raise ValueError(f"Failed to load config file {filename}: {e}") from e
 
