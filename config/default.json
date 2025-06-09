@@ -1,0 +1,30 @@
+{
+  "servicenow": {
+    "instance": "",
+    "username": "",
+    "password": "",
+    "api_version": "v2",
+    "timeout": 30,
+    "max_retries": 3
+  },
+  "mcp": {
+    "name": "servicenow-mcp",
+    "version": "0.1.0",
+    "description": "ServiceNow API integration via MCP"
+  },
+  "features": {
+    "incident_management": true,
+    "change_management": true,
+    "problem_management": true,
+    "service_catalog": true,
+    "knowledge_base": true,
+    "user_management": true,
+    "cmdb": true,
+    "custom_tables": true
+  },
+  "logging": {
+    "level": "INFO",
+    "format": "json",
+    "file": "logs/servicenow-mcp.log"
+  }
+}

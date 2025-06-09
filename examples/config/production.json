@@ -1,0 +1,24 @@
+{
+  "servicenow": {
+    "instance": "prod.service-now.com",
+    "username": "",
+    "password": "",
+    "timeout": 60,
+    "max_retries": 5
+  },
+  "features": {
+    "incident_management": true,
+    "change_management": true,
+    "problem_management": true,
+    "service_catalog": true,
+    "knowledge_base": true,
+    "user_management": true,
+    "cmdb": true,
+    "custom_tables": true
+  },
+  "logging": {
+    "level": "WARNING",
+    "format": "json",
+    "file": "/var/log/servicenow-mcp/server.log"
+  }
+}
