@@ -5,7 +5,7 @@ import logging
 from typing import Any, Optional
 
 import click
-from mcp.server import Server  # type: ignore[import]
+from mcp.server import Server
 from mcp.server.models import InitializationOptions
 from mcp.server.stdio import stdio_server
 from mcp.types import (
@@ -129,8 +129,8 @@ class ServiceNowMCPServer:
             init_options = InitializationOptions(
                 server_name=self.config.mcp.name,
                 server_version=self.config.mcp.version,
-                capabilities=self.server.get_capabilities(  # type: ignore[arg-type]
-                    notification_options=None,
+                capabilities=self.server.get_capabilities(
+                    notification_options=None,  # type: ignore[arg-type]
                     experimental_capabilities={},
                 ),
             )
@@ -158,6 +158,7 @@ def main(config_dir: str, log_level: Optional[str]) -> None:
     """Run the ServiceNow MCP Server."""
     # Load configuration
     from pathlib import Path
+
     config_manager = ConfigManager(Path(config_dir))
     config = config_manager.load()
 

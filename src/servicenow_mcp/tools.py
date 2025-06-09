@@ -1,6 +1,7 @@
 """Tool definitions and handlers for ServiceNow operations."""
 
-from typing import Any, Callable, Optional, Awaitable
+from collections.abc import Awaitable
+from typing import Any, Callable, Optional
 
 from mcp.types import Tool
 
@@ -556,7 +557,9 @@ class ToolRegistry:
             self._handle_get_stats,
         )
 
-    def _register_tool(self, name: str, tool: Tool, handler: Callable[..., Awaitable[Any]]) -> None:
+    def _register_tool(
+        self, name: str, tool: Tool, handler: Callable[..., Awaitable[Any]]
+    ) -> None:
         """Register a tool with its handler."""
         self._tools[name] = tool
         self._handlers[name] = handler

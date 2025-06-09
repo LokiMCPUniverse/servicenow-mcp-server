@@ -142,7 +142,7 @@ class ServiceNowClient:
             params["sysparm_fields"] = ",".join(fields)
 
         result = await self._request("GET", endpoint, params=params)
-        return result.get("result", {})
+        return result.get("result", {})  # type: ignore[no-any-return]
 
     async def query_records(
         self,
@@ -172,7 +172,7 @@ class ServiceNowClient:
             params["sysparm_order_by"] = order_by
 
         result = await self._request("GET", endpoint, params=params)
-        return result.get("result", [])
+        return result.get("result", [])  # type: ignore[no-any-return]
 
     async def create_record(
         self,
@@ -185,7 +185,7 @@ class ServiceNowClient:
         params = {"sysparm_display_value": display_value}
 
         result = await self._request("POST", endpoint, params=params, data=data)
-        return result.get("result", {})
+        return result.get("result", {})  # type: ignore[no-any-return]
 
     async def update_record(
         self,
@@ -199,7 +199,7 @@ class ServiceNowClient:
         params = {"sysparm_display_value": display_value}
 
         result = await self._request("PATCH", endpoint, params=params, data=data)
-        return result.get("result", {})
+        return result.get("result", {})  # type: ignore[no-any-return]
 
     async def delete_record(self, table: str, sys_id: str) -> bool:
         """Delete a record from a table."""
@@ -241,7 +241,7 @@ class ServiceNowClient:
             params["sysparm_aggregate"] = ",".join(agg_list)
 
         result = await self._request("GET", endpoint, params=params)
-        return result.get("result", [])
+        return result.get("result", [])  # type: ignore[no-any-return]
 
     # Attachment API methods
 
@@ -257,7 +257,7 @@ class ServiceNowClient:
         }
 
         result = await self._request("GET", endpoint, params=params)
-        return result.get("result", [])
+        return result.get("result", [])  # type: ignore[no-any-return]
 
     async def upload_attachment(
         self,
@@ -293,7 +293,7 @@ class ServiceNowClient:
             headers=headers,
         )
 
-        return self._handle_response(response).get("result", {})
+        return self._handle_response(response).get("result", {})  # type: ignore[no-any-return]
 
     # Import Set API methods
 
@@ -306,7 +306,7 @@ class ServiceNowClient:
         endpoint = f"import/{table}"
 
         result = await self._request("POST", endpoint, data={"records": data})
-        return result.get("result", {})
+        return result.get("result", {})  # type: ignore[no-any-return]
 
     # Specialized methods for common tables
 
@@ -318,7 +318,9 @@ class ServiceNowClient:
         """Query incidents."""
         return await self.query_records("incident", **kwargs)
 
-    async def create_incident(self, data: dict[str, Any], **kwargs: Any) -> dict[str, Any]:
+    async def create_incident(
+        self, data: dict[str, Any], **kwargs: Any
+    ) -> dict[str, Any]:
         """Create a new incident."""
         return await self.create_record("incident", data, **kwargs)
 
