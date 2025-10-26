@@ -27,7 +27,11 @@ class ServiceNowConfig(BaseModel):
 
         if not v.startswith(("http://", "https://")):
             # If just subdomain provided, construct full URL
-            v = f"https://{v}.service-now.com"
+            # Only add .service-now.com if it's not already present
+            if not v.endswith(".service-now.com"):
+                v = f"https://{v}.service-now.com"
+            else:
+                v = f"https://{v}"
 
         return v.rstrip("/")
 
