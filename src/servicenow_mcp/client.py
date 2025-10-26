@@ -22,7 +22,11 @@ class ServiceNowClient:
     def __init__(self, config: ServiceNowConfig) -> None:
         """Initialize ServiceNow client."""
         self.config = config
-        self.base_url = f"{config.instance}/api/now"
+        # Ensure instance is properly formatted (should be handled by config validation)
+        instance = config.instance
+        if not instance.startswith(("http://", "https://")):
+            instance = f"https://{instance}"
+        self.base_url = f"{instance}/api/now"
         self._client: Optional[httpx.AsyncClient] = None
 
     async def __aenter__(self) -> "ServiceNowClient":

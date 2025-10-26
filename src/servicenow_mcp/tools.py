@@ -777,16 +777,21 @@ class ToolRegistry:
 
         # Enhance with CI details
         for rel in relationships:
-            if rel.get("parent") == args["ci_sys_id"]:
-                # Get child CI details
-                child_ci = await client.get_record("cmdb_ci", rel["child"])
-                rel["related_ci"] = child_ci
-                rel["direction"] = "outgoing"
-            else:
-                # Get parent CI details
-                parent_ci = await client.get_record("cmdb_ci", rel["parent"])
-                rel["related_ci"] = parent_ci
-                rel["direction"] = "incoming"
+            try:
+                if rel.get("parent") == args["ci_sys_id"]:
+                    # Get child CI details
+                    child_ci = await client.get_record("cmdb_ci", rel["child"])
+                    rel["related_ci"] = child_ci
+                    rel["direction"] = "outgoing"
+                else:
+                    # Get parent CI details
+                    parent_ci = await client.get_record("cmdb_ci", rel["parent"])
+                    rel["related_ci"] = parent_ci
+                    rel["direction"] = "incoming"
+            except Exception as e:
+                # Log error but continue with other relationships
+                rel["related_ci"] = None
+                rel["error"] = str(e)
 
         return relationships
 
