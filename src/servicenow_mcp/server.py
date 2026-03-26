@@ -6,6 +6,7 @@ from typing import Any, Optional
 
 import click
 from mcp.server import Server
+from mcp.server.lowlevel.server import NotificationOptions
 from mcp.server.models import InitializationOptions
 from mcp.server.stdio import stdio_server
 from mcp.types import (
@@ -130,7 +131,7 @@ class ServiceNowMCPServer:
                 server_name=self.config.mcp.name,
                 server_version=self.config.mcp.version,
                 capabilities=self.server.get_capabilities(
-                    notification_options=None,  # type: ignore[arg-type]
+                    notification_options=NotificationOptions(),
                     experimental_capabilities={},
                 ),
             )
