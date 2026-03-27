@@ -37,8 +37,10 @@ class ServiceNowClient:
     async def connect(self) -> None:
         """Initialize HTTP client."""
         if self._client is None:
+            cookies = self.config.session_cookies
             self._client = httpx.AsyncClient(
-                auth=(self.config.username, self.config.password),
+                auth=None if cookies else (self.config.username, self.config.password),
+                cookies=httpx.Cookies(cookies) if cookies else None,
                 timeout=self.config.timeout,
                 headers={
                     "Accept": "application/json",
@@ -275,8 +277,6 @@ class ServiceNowClient:
             "file_name": filename,
         }
 
-        # For file uploads, we need to use multipart form data
-        # This is a simplified version - in production, use proper multipart handling
         headers = {
             "Content-Type": content_type,
         }
