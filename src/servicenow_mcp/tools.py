@@ -384,6 +384,112 @@ class ToolRegistry:
             self._handle_change_create,
         )
 
+        self._register_tool(
+            "change_search",
+            Tool(
+                name="change_search",
+                description="Search for change requests",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                        "state": {
+                            "type": "string",
+                            "description": "Filter by state",
+                        },
+                        "assignment_group": {
+                            "type": "string",
+                            "description": "Filter by assignment group",
+                        },
+                        "category": {
+                            "type": "string",
+                            "description": "Filter by category",
+                        },
+                        "type": {
+                            "type": "string",
+                            "description": "Filter by change type (normal, standard, emergency)",
+                        },
+                        "created_after": {
+                            "type": "string",
+                            "description": "Created after date (YYYY-MM-DD)",
+                        },
+                        "text_search": {
+                            "type": "string",
+                            "description": "Search in short description",
+                        },
+                        "limit": {"type": "integer", "default": 50},
+                    },
+                },
+            ),
+            self._handle_change_search,
+        )
+
+        self._register_tool(
+            "change_update",
+            Tool(
+                name="change_update",
+                description="Update an existing change request",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                        "sys_id": {
+                            "type": "string",
+                            "description": "System ID of the change request",
+                        },
+                        "work_notes": {
+                            "type": "string",
+                            "description": "Work notes (internal)",
+                        },
+                        "state": {
+                            "type": "string",
+                            "description": "State value",
+                        },
+                        "assignment_group": {
+                            "type": "string",
+                            "description": "Assignment group",
+                        },
+                        "close_code": {
+                            "type": "string",
+                            "description": "Close code when closing",
+                        },
+                        "close_notes": {
+                            "type": "string",
+                            "description": "Close notes",
+                        },
+                        "custom_fields": {
+                            "type": "object",
+                            "description": "Additional fields to update",
+                        },
+                    },
+                    "required": ["sys_id"],
+                },
+            ),
+            self._handle_change_update,
+        )
+
+        self._register_tool(
+            "change_tasks",
+            Tool(
+                name="change_tasks",
+                description="List tasks of a change request",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                        "change_sys_id": {
+                            "type": "string",
+                            "description": "System ID of the parent change request",
+                        },
+                        "state": {
+                            "type": "string",
+                            "description": "Filter by task state",
+                        },
+                        "limit": {"type": "integer", "default": 20},
+                    },
+                    "required": ["change_sys_id"],
+                },
+            ),
+            self._handle_change_tasks,
+        )
+
         # CMDB
         self._register_tool(
             "ci_search",
@@ -736,6 +842,81 @@ class ToolRegistry:
         data = {k: v for k, v in data.items() if v is not None}
 
         return await client.create_record("change_request", data, display_value="both")
+
+    async def _handle_change_search(
+        self, client: ServiceNowClient, args: dict[str, Any]
+    ) -> Any:
+        """Handle change request search."""
+        query_parts = []
+
+        if "state" in args:
+            query_parts.append(f"state={args['state']}")
+
+        if "assignment_group" in args:
+            query_parts.append(f"assignment_group.name={args['assignment_group']}")
+
+        if "category" in args:
+            query_parts.append(f"category={args['category']}")
+
+        if "type" in args:
+            query_parts.append(f"type={args['type']}")
+
+        if "created_after" in args:
+            query_parts.append(f"sys_created_on>{args['created_after']}")
+
+        if "text_search" in args:
+            query_parts.append(f"short_descriptionLIKE{args['text_search']}")
+
+        query = "^".join(query_parts) if query_parts else None
+
+        return await client.query_records(
+            "change_request",
+            query=query,
+            limit=args.get("limit", 50),
+            order_by="-sys_created_on",
+            display_value="both",
+        )
+
+    async def _handle_change_update(
+        self, client: ServiceNowClient, args: dict[str, Any]
+    ) -> Any:
+        """Handle change request update."""
+        sys_id = args["sys_id"]
+        data = {}
+
+        if "work_notes" in args:
+            data["work_notes"] = args["work_notes"]
+        if "state" in args:
+            data["state"] = args["state"]
+        if "assignment_group" in args:
+            data["assignment_group"] = args["assignment_group"]
+        if "close_code" in args:
+            data["close_code"] = args["close_code"]
+        if "close_notes" in args:
+            data["close_notes"] = args["close_notes"]
+        if "custom_fields" in args:
+            data.update(args["custom_fields"])
+
+        return await client.update_record(
+            "change_request", sys_id, data, display_value="both"
+        )
+
+    async def _handle_change_tasks(
+        self, client: ServiceNowClient, args: dict[str, Any]
+    ) -> Any:
+        """Handle change task listing."""
+        query = f"change_request={args['change_sys_id']}"
+
+        if "state" in args:
+            query += f"^state={args['state']}"
+
+        return await client.query_records(
+            "change_task",
+            query=query,
+            limit=args.get("limit", 20),
+            order_by="order",
+            display_value="both",
+        )
 
     async def _handle_ci_search(
         self, client: ServiceNowClient, args: dict[str, Any]
