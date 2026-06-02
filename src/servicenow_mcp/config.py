@@ -12,8 +12,11 @@ class ServiceNowConfig(BaseModel):
     """ServiceNow connection configuration."""
 
     instance: str = Field(..., description="ServiceNow instance URL or subdomain")
-    username: str = Field(default="", description="ServiceNow username")
-    password: str = Field(default="", description="ServiceNow password")
+    username: str = Field(default="", description="ServiceNow username (basic auth)")
+    password: str = Field(default="", description="ServiceNow password (basic auth)")
+    oauth_client_id: Optional[str] = Field(default=None, description="OAuth2 client_credentials client_id")
+    oauth_client_secret: Optional[str] = Field(default=None, description="OAuth2 client_credentials client_secret")
+    oauth_token_url: Optional[str] = Field(default=None, description="OAuth2 token endpoint (default: {instance}/oauth_token.do)")
     session_cookies: Optional[dict[str, str]] = Field(default=None, description="Session cookies from SSO login")
     api_version: str = Field(default="v2", description="ServiceNow API version")
     timeout: int = Field(default=30, description="Request timeout in seconds")
@@ -139,6 +142,9 @@ class ConfigManager:
             "SERVICENOW_INSTANCE": ["servicenow", "instance"],
             "SERVICENOW_USERNAME": ["servicenow", "username"],
             "SERVICENOW_PASSWORD": ["servicenow", "password"],
+            "SERVICENOW_OAUTH_CLIENT_ID": ["servicenow", "oauth_client_id"],
+            "SERVICENOW_OAUTH_CLIENT_SECRET": ["servicenow", "oauth_client_secret"],
+            "SERVICENOW_OAUTH_TOKEN_URL": ["servicenow", "oauth_token_url"],
             "SERVICENOW_SESSION_COOKIES": ["servicenow", "session_cookies"],
             "SERVICENOW_API_VERSION": ["servicenow", "api_version"],
             "SERVICENOW_TIMEOUT": ["servicenow", "timeout"],
