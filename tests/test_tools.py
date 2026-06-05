@@ -381,7 +381,7 @@ class TestToolRegistry:
         }
 
         handler = registry.get_handler("ritm_create")
-        result = await handler(
+        await handler(
             mock_client,
             {
                 "cat_item": "cat_sys_id_123",
