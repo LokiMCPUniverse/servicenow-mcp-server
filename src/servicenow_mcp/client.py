@@ -3,7 +3,7 @@
 import asyncio
 import json
 import time
-from typing import Any, Optional
+from typing import Any
 
 import httpx
 from httpx import Response
@@ -24,8 +24,8 @@ class ServiceNowClient:
         """Initialize ServiceNow client."""
         self.config = config
         self.base_url = f"{config.instance}/api/now"
-        self._client: Optional[httpx.AsyncClient] = None
-        self._oauth_token: Optional[str] = None
+        self._client: httpx.AsyncClient | None = None
+        self._oauth_token: str | None = None
         self._oauth_expires_at: float = 0
 
     async def __aenter__(self) -> "ServiceNowClient":
@@ -109,8 +109,8 @@ class ServiceNowClient:
         self,
         method: str,
         endpoint: str,
-        params: Optional[dict[str, Any]] = None,
-        data: Optional[dict[str, Any]] = None,
+        params: dict[str, Any] | None = None,
+        data: dict[str, Any] | None = None,
         retry_count: int = 0,
     ) -> dict[str, Any]:
         """Make an HTTP request to ServiceNow API."""
@@ -205,7 +205,7 @@ class ServiceNowClient:
         self,
         table: str,
         sys_id: str,
-        fields: Optional[list[str]] = None,
+        fields: list[str] | None = None,
         display_value: str = "false",
     ) -> dict[str, Any]:
         """Get a single record from a table."""
@@ -221,11 +221,11 @@ class ServiceNowClient:
     async def query_records(
         self,
         table: str,
-        query: Optional[str] = None,
-        fields: Optional[list[str]] = None,
+        query: str | None = None,
+        fields: list[str] | None = None,
         limit: int = 100,
         offset: int = 0,
-        order_by: Optional[str] = None,
+        order_by: str | None = None,
         display_value: str = "false",
     ) -> list[dict[str, Any]]:
         """Query records from a table."""
@@ -287,10 +287,10 @@ class ServiceNowClient:
     async def get_aggregate(
         self,
         table: str,
-        query: Optional[str] = None,
-        group_by: Optional[list[str]] = None,
-        having: Optional[str] = None,
-        aggregate: Optional[list[dict[str, str]]] = None,
+        query: str | None = None,
+        group_by: list[str] | None = None,
+        having: str | None = None,
+        aggregate: list[dict[str, str]] | None = None,
     ) -> list[dict[str, Any]]:
         """Get aggregate data from a table."""
         endpoint = f"stats/{table}"
@@ -429,8 +429,8 @@ class ServiceNowClient:
     async def order_catalog_item(
         self,
         cat_item: str,
-        variables: Optional[dict[str, Any]] = None,
-        requested_for: Optional[str] = None,
+        variables: dict[str, Any] | None = None,
+        requested_for: str | None = None,
     ) -> dict[str, Any]:
         """Order a service catalog item (creates RITM)."""
         endpoint = f"sn_sc/servicecatalog/items/{cat_item}/order_now"
