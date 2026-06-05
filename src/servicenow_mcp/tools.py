@@ -1,7 +1,7 @@
 """Tool definitions and handlers for ServiceNow operations."""
 
-from collections.abc import Awaitable
-from typing import Any, Callable, Optional
+from collections.abc import Awaitable, Callable
+from typing import Any
 
 from mcp.types import Tool
 
@@ -32,7 +32,7 @@ class ToolRegistry:
 
         return enabled_tools
 
-    def get_handler(self, name: str) -> Optional[Callable[..., Awaitable[Any]]]:
+    def get_handler(self, name: str) -> Callable[..., Awaitable[Any]] | None:
         """Get handler for a specific tool."""
         return self._handlers.get(name)
 
@@ -43,6 +43,7 @@ class ToolRegistry:
             "change": self.features.change_management,
             "problem": self.features.problem_management,
             "catalog": self.features.service_catalog,
+            "ritm": self.features.service_catalog,
             "kb": self.features.knowledge_base,
             "user": self.features.user_management,
             "cmdb": self.features.cmdb,
@@ -377,11 +378,121 @@ class ToolRegistry:
                             "type": "string",
                             "description": "Planned end date (YYYY-MM-DD HH:MM:SS)",
                         },
+                        "custom_fields": {
+                            "type": "object",
+                            "description": "Additional fields to include in the change request",
+                        },
                     },
                     "required": ["short_description", "type"],
                 },
             ),
             self._handle_change_create,
+        )
+
+        self._register_tool(
+            "change_search",
+            Tool(
+                name="change_search",
+                description="Search for change requests",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                        "state": {
+                            "type": "string",
+                            "description": "Filter by state",
+                        },
+                        "assignment_group": {
+                            "type": "string",
+                            "description": "Filter by assignment group",
+                        },
+                        "category": {
+                            "type": "string",
+                            "description": "Filter by category",
+                        },
+                        "type": {
+                            "type": "string",
+                            "description": "Filter by change type (normal, standard, emergency)",
+                        },
+                        "created_after": {
+                            "type": "string",
+                            "description": "Created after date (YYYY-MM-DD)",
+                        },
+                        "text_search": {
+                            "type": "string",
+                            "description": "Search in short description",
+                        },
+                        "limit": {"type": "integer", "default": 50},
+                    },
+                },
+            ),
+            self._handle_change_search,
+        )
+
+        self._register_tool(
+            "change_update",
+            Tool(
+                name="change_update",
+                description="Update an existing change request",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                        "sys_id": {
+                            "type": "string",
+                            "description": "System ID of the change request",
+                        },
+                        "work_notes": {
+                            "type": "string",
+                            "description": "Work notes (internal)",
+                        },
+                        "state": {
+                            "type": "string",
+                            "description": "State value",
+                        },
+                        "assignment_group": {
+                            "type": "string",
+                            "description": "Assignment group",
+                        },
+                        "close_code": {
+                            "type": "string",
+                            "description": "Close code when closing",
+                        },
+                        "close_notes": {
+                            "type": "string",
+                            "description": "Close notes",
+                        },
+                        "custom_fields": {
+                            "type": "object",
+                            "description": "Additional fields to update",
+                        },
+                    },
+                    "required": ["sys_id"],
+                },
+            ),
+            self._handle_change_update,
+        )
+
+        self._register_tool(
+            "change_tasks",
+            Tool(
+                name="change_tasks",
+                description="List tasks of a change request",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                        "change_sys_id": {
+                            "type": "string",
+                            "description": "System ID of the parent change request",
+                        },
+                        "state": {
+                            "type": "string",
+                            "description": "Filter by task state",
+                        },
+                        "limit": {"type": "integer", "default": 20},
+                    },
+                    "required": ["change_sys_id"],
+                },
+            ),
+            self._handle_change_tasks,
         )
 
         # CMDB
@@ -518,6 +629,69 @@ class ToolRegistry:
                 },
             ),
             self._handle_catalog_items,
+        )
+
+        # RITM (Requested Item) operations
+        self._register_tool(
+            "ritm_search",
+            Tool(
+                name="ritm_search",
+                description="Search for requested items (RITMs)",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                        "state": {
+                            "type": "string",
+                            "description": "Filter by state",
+                        },
+                        "cat_item": {
+                            "type": "string",
+                            "description": "Filter by catalog item sys_id",
+                        },
+                        "requested_for": {
+                            "type": "string",
+                            "description": "Filter by requested_for username",
+                        },
+                        "opened_at": {
+                            "type": "string",
+                            "description": "Filter opened after date (YYYY-MM-DD)",
+                        },
+                        "limit": {
+                            "type": "integer",
+                            "description": "Maximum results",
+                            "default": 50,
+                        },
+                    },
+                },
+            ),
+            self._handle_ritm_search,
+        )
+
+        self._register_tool(
+            "ritm_create",
+            Tool(
+                name="ritm_create",
+                description="Order a service catalog item (creates RITM)",
+                inputSchema={
+                    "type": "object",
+                    "properties": {
+                        "cat_item": {
+                            "type": "string",
+                            "description": "Catalog item sys_id",
+                        },
+                        "variables": {
+                            "type": "object",
+                            "description": "Variables for the catalog item",
+                        },
+                        "requested_for": {
+                            "type": "string",
+                            "description": "User sys_id to request for",
+                        },
+                    },
+                    "required": ["cat_item"],
+                },
+            ),
+            self._handle_ritm_create,
         )
 
         # Aggregate operations
@@ -735,7 +909,86 @@ class ToolRegistry:
         # Remove None values
         data = {k: v for k, v in data.items() if v is not None}
 
+        # Merge custom fields
+        if args.get("custom_fields"):
+            data.update(args["custom_fields"])
+
         return await client.create_record("change_request", data, display_value="both")
+
+    async def _handle_change_search(
+        self, client: ServiceNowClient, args: dict[str, Any]
+    ) -> Any:
+        """Handle change request search."""
+        query_parts = []
+
+        if "state" in args:
+            query_parts.append(f"state={args['state']}")
+
+        if "assignment_group" in args:
+            query_parts.append(f"assignment_group.name={args['assignment_group']}")
+
+        if "category" in args:
+            query_parts.append(f"category={args['category']}")
+
+        if "type" in args:
+            query_parts.append(f"type={args['type']}")
+
+        if "created_after" in args:
+            query_parts.append(f"sys_created_on>{args['created_after']}")
+
+        if "text_search" in args:
+            query_parts.append(f"short_descriptionLIKE{args['text_search']}")
+
+        query = "^".join(query_parts) if query_parts else None
+
+        return await client.query_records(
+            "change_request",
+            query=query,
+            limit=args.get("limit", 50),
+            order_by="-sys_created_on",
+            display_value="both",
+        )
+
+    async def _handle_change_update(
+        self, client: ServiceNowClient, args: dict[str, Any]
+    ) -> Any:
+        """Handle change request update."""
+        sys_id = args["sys_id"]
+        data = {}
+
+        if "work_notes" in args:
+            data["work_notes"] = args["work_notes"]
+        if "state" in args:
+            data["state"] = args["state"]
+        if "assignment_group" in args:
+            data["assignment_group"] = args["assignment_group"]
+        if "close_code" in args:
+            data["close_code"] = args["close_code"]
+        if "close_notes" in args:
+            data["close_notes"] = args["close_notes"]
+        if "custom_fields" in args:
+            data.update(args["custom_fields"])
+
+        return await client.update_record(
+            "change_request", sys_id, data, display_value="both"
+        )
+
+    async def _handle_change_tasks(
+        self, client: ServiceNowClient, args: dict[str, Any]
+    ) -> Any:
+        """Handle change task listing."""
+        query = f"change_request={args['change_sys_id']}"
+
+        if "state" in args:
+            query += f"^state={args['state']}"
+
+        return await client.query_records(
+            "change_task",
+            query=query,
+            limit=args.get("limit", 20),
+            order_by="order",
+            display_value="both",
+        )
 
     async def _handle_ci_search(
         self, client: ServiceNowClient, args: dict[str, Any]
@@ -904,4 +1157,42 @@ class ToolRegistry:
             aggregate=args.get(
                 "aggregates", [{"type": "COUNT", "field": "sys_id", "alias": "count"}]
             ),
+        )
+
+    async def _handle_ritm_search(
+        self, client: ServiceNowClient, args: dict[str, Any]
+    ) -> Any:
+        """Handle RITM search."""
+        query_parts = []
+
+        if "state" in args:
+            query_parts.append(f"state={args['state']}")
+
+        if "cat_item" in args:
+            query_parts.append(f"cat_item={args['cat_item']}")
+
+        if "requested_for" in args:
+            query_parts.append(f"requested_for.user_name={args['requested_for']}")
+
+        if "opened_at" in args:
+            query_parts.append(f"opened_at>{args['opened_at']}")
+
+        query = "^".join(query_parts) if query_parts else None
+
+        return await client.query_records(
+            "sc_req_item",
+            query=query,
+            limit=args.get("limit", 50),
+            order_by="-opened_at",
+            display_value="both",
+        )
+
+    async def _handle_ritm_create(
+        self, client: ServiceNowClient, args: dict[str, Any]
+    ) -> Any:
+        """Handle RITM creation via service catalog order."""
+        return await client.order_catalog_item(
+            cat_item=args["cat_item"],
+            variables=args.get("variables"),
+            requested_for=args.get("requested_for"),
         )

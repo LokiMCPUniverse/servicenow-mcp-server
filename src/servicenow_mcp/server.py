@@ -2,10 +2,11 @@
 
 import asyncio
 import logging
-from typing import Any, Optional
+from typing import Any
 
 import click
 from mcp.server import Server
+from mcp.server.lowlevel.server import NotificationOptions
 from mcp.server.models import InitializationOptions
 from mcp.server.stdio import stdio_server
 from mcp.types import (
@@ -130,7 +131,7 @@ class ServiceNowMCPServer:
                 server_name=self.config.mcp.name,
                 server_version=self.config.mcp.version,
                 capabilities=self.server.get_capabilities(
-                    notification_options=None,  # type: ignore[arg-type]
+                    notification_options=NotificationOptions(),
                     experimental_capabilities={},
                 ),
             )
@@ -154,7 +155,7 @@ class ServiceNowMCPServer:
     type=click.Choice(["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]),
     help="Override log level",
 )
-def main(config_dir: str, log_level: Optional[str]) -> None:
+def main(config_dir: str, log_level: str | None) -> None:
     """Run the ServiceNow MCP Server."""
     # Load configuration
     from pathlib import Path
