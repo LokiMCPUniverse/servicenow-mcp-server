@@ -14,10 +14,19 @@ class ServiceNowConfig(BaseModel):
     instance: str = Field(..., description="ServiceNow instance URL or subdomain")
     username: str = Field(default="", description="ServiceNow username (basic auth)")
     password: str = Field(default="", description="ServiceNow password (basic auth)")
-    oauth_client_id: Optional[str] = Field(default=None, description="OAuth2 client_credentials client_id")
-    oauth_client_secret: Optional[str] = Field(default=None, description="OAuth2 client_credentials client_secret")
-    oauth_token_url: Optional[str] = Field(default=None, description="OAuth2 token endpoint (default: {instance}/oauth_token.do)")
-    session_cookies: Optional[dict[str, str]] = Field(default=None, description="Session cookies from SSO login")
+    oauth_client_id: Optional[str] = Field(
+        default=None, description="OAuth2 client_credentials client_id"
+    )
+    oauth_client_secret: Optional[str] = Field(
+        default=None, description="OAuth2 client_credentials client_secret"
+    )
+    oauth_token_url: Optional[str] = Field(
+        default=None,
+        description="OAuth2 token endpoint (default: {instance}/oauth_token.do)",
+    )
+    session_cookies: Optional[dict[str, str]] = Field(
+        default=None, description="Session cookies from SSO login"
+    )
     api_version: str = Field(default="v2", description="ServiceNow API version")
     timeout: int = Field(default=30, description="Request timeout in seconds")
     max_retries: int = Field(default=3, description="Maximum number of retry attempts")

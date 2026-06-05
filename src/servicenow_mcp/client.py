@@ -47,7 +47,9 @@ class ServiceNowClient:
         if self._oauth_token and time.time() < self._oauth_expires_at - 60:
             return self._oauth_token
 
-        token_url = self.config.oauth_token_url or f"{self.config.instance}/oauth_token.do"
+        token_url = (
+            self.config.oauth_token_url or f"{self.config.instance}/oauth_token.do"
+        )
         async with httpx.AsyncClient(verify=False, timeout=15) as client:
             resp = await client.post(
                 token_url,
@@ -141,12 +143,16 @@ class ServiceNowClient:
                 token = await self._get_oauth_token()
                 assert self._client is not None
                 self._client.headers["Authorization"] = f"Bearer {token}"
-                return await self._request(method, endpoint, params, data, retry_count + 1)
+                return await self._request(
+                    method, endpoint, params, data, retry_count + 1
+                )
             raise
 
         except httpx.HTTPStatusError as e:
             is_idempotent = method.upper() in ("GET", "HEAD", "OPTIONS")
-            is_retryable = e.response.status_code == 429 or (e.response.status_code >= 500 and is_idempotent)
+            is_retryable = e.response.status_code == 429 or (
+                e.response.status_code >= 500 and is_idempotent
+            )
             if is_retryable and retry_count < self.config.max_retries:
                 wait_time = 2**retry_count
                 await asyncio.sleep(wait_time)

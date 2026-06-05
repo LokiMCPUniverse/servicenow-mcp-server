@@ -316,7 +316,6 @@ class TestToolRegistry:
             aggregate=[{"type": "COUNT", "field": "sys_id", "alias": "count"}],
         )
 
-
     @pytest.mark.asyncio
     async def test_change_create_custom_fields(self):
         """Test change_create with custom_fields."""
@@ -377,7 +376,8 @@ class TestToolRegistry:
 
         mock_client = AsyncMock()
         mock_client.order_catalog_item.return_value = {
-            "sys_id": "ritm2", "number": "RITM0000002"
+            "sys_id": "ritm2",
+            "number": "RITM0000002",
         }
 
         handler = registry.get_handler("ritm_create")
